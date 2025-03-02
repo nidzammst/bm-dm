@@ -1,0 +1,57 @@
+// This file is your Prisma schema file
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model AdminAccount {
+  id          String        @id @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  transactions Transaction[]
+
+  @@map("admin_accounts")
+}
+
+model Member {
+  id                String        @id @default(uuid())
+  name              String
+  updatedAt         DateTime      @updatedAt
+  balance           Int         @default(0)
+  transactions      Transaction[] @relation("MemberTransactions")
+  currentTransaction Transaction[] @relation("CurrentMemberTransactions")
+
+  @@map("members")
+}
+
+model Transaction {
+  id          String          @id @default(uuid())
+  amount      Int           
+  type        TransactionType
+  description String?
+  createdAt   DateTime        @default(now())
+  
+  admin       AdminAccount    @relation(fields: [adminId], references: [id])
+  adminId     String
+
+  member      Member          @relation("MemberTransactions", fields: [memberId], references: [id])
+  memberId    String
+
+  currentMember Member?        @relation("CurrentMemberTransactions", fields: [currentMemberId], references: [id])
+  currentMemberId String?
+
+  @@map("transactions")
+}
+
+enum TransactionType {
+  DEPOSIT
+  WITHDRAWAL
+  TRANSFER
+}
