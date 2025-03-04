@@ -5,9 +5,12 @@ import { NextRequest } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
-    const { name, email } = JSON.parse(await req.text());
+    const { name, username } = JSON.parse(await req.text());
 
-    const userData = Validation.validate(UserValidation.REGISTER, { name, email });
+    const userData = Validation.validate(UserValidation.REGISTER, {
+      name,
+      username,
+    });
     const data = await prismaClient.adminAccount.create({
       data: userData,
     });

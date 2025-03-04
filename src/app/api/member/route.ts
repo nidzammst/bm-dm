@@ -5,12 +5,15 @@ import { NextRequest } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
-    const { name, email } = JSON.parse(await req.text());
+    const { name, username } = JSON.parse(await req.text());
 
-    const data = Validation.validate(UserValidation.ADDMEMBER, { name, email });
+    const data = Validation.validate(UserValidation.ADDMEMBER, {
+      name,
+      username,
+    });
 
     const isMemberExist = await prismaClient.member.findFirst({
-      where: { email: email },
+      where: { username: data.username },
     });
 
     if (isMemberExist) {
@@ -42,7 +45,7 @@ export async function GET(req: NextRequest) {
     const page = searchParams.get("page");
 
     const skip = Number(limit) * (Number(page) - 1);
-    
+
     const members = await prismaClient.member.findMany({
       include: { transactions: true },
       skip,

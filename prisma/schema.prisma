@@ -10,53 +10,48 @@ datasource db {
 }
 
 model AdminAccount {
-  id           String        @id @default(uuid())
-  name         String
-  email        String        @unique
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  username     String        @id @db.VarChar(100)
+  name         String        @db.VarChar(100)
   transactions Transaction[]
 
   @@map("admin_accounts")
 }
 
 model Member {
-  id           String        @id @default(uuid())
-  name         String
-  email        String        @unique
-  updatedAt    DateTime      @updatedAt
-  balance      Int           @default(0)
-  transactions Transaction[] @relation("MemberTransactions")
-  transferring Transaction[] @relation("TransferringTransactions")
-  receiving    Transaction[] @relation("ReceivingTransactions")
+  username           String        @id @db.VarChar(100)
+  name               String
+  balance            Int           @default(0)
+  transactions       Transaction[] @relation("MemberTransactions")
+  transferring       Transaction[] @relation("TransferringTransactions")
+  receiving          Transaction[] @relation("ReceivingTransactions")
+  currentTransaction Transaction[]
 
   @@map("members")
 }
 
 model Transaction {
-  id          String          @id @default(uuid())
-  amount      Int
-  type        TransactionType
-  description String?
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @default(now())
-
+  id                    Int             @id @default(autoincrement())
+  amount                Int
+  type                  TransactionType
+  description           String?
   balanceBefore         Int
   balanceAfter          Int
   receiverBalanceBefore Int?
   receiverBalanceAfter  Int?
 
-  admin   AdminAccount @relation(fields: [adminId], references: [id])
+  admin   AdminAccount @relation(fields: [adminId], references: [username])
   adminId String
 
-  member   Member @relation("MemberTransactions", fields: [memberId], references: [id])
+  member   Member @relation("MemberTransactions", fields: [memberId], references: [username])
   memberId String
 
-  transferring   Member? @relation("TransferringTransactions", fields: [transferringId], references: [id])
+  transferring   Member? @relation("TransferringTransactions", fields: [transferringId], references: [username])
   transferringId String?
 
-  receiving   Member? @relation("ReceivingTransactions", fields: [receivingId], references: [id])
-  receivingId String?
+  receiving      Member? @relation("ReceivingTransactions", fields: [receivingId], references: [username])
+  receivingId    String?
+  Member         Member? @relation(fields: [memberUsername], references: [username])
+  memberUsername String? @db.VarChar(100)
 
   @@map("transactions")
 }

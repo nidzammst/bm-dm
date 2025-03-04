@@ -6,15 +6,16 @@ import { NextRequest } from "next/server";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ userId: string }> }
+  { params }: { params: Promise<{ username: string }> }
 ) {
   try {
-    const { userId } = await params;
+    const { username } = await params;
 
     const adminAccount = await prismaClient.adminAccount.findUnique({
       where: {
-        id: userId,
+        username,
       },
+      include: { transactions: true },
     });
 
     if (!adminAccount) {
@@ -31,10 +32,10 @@ export async function GET(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: Promise<{ userId: string }> }
+  { params }: { params: Promise<{ username: string }> }
 ) {
   try {
-    const { userId } = await params;
+    const { username } = await params;
 
     const { name } = JSON.parse(await req.text());
     const updatedData = Validation.validate(UserValidation.UPDATE, {
@@ -42,7 +43,7 @@ export async function PUT(
     });
 
     const updatedAdmin = await prismaClient.adminAccount.update({
-      where: { id: userId },
+      where: { username },
       data: {
         name: updatedData.name,
       },
@@ -62,27 +63,20 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: Promise<{ userId: string }> }
+  { params }: { params: Promise<{ username: string }> }
 ) {
   try {
-    const { userId } = await params;
-
-    const isAdminExist = await prismaClient.adminAccount.findFirst({
-      where: {
-        id: userId,
-      },
-    });
-
-    if (!isAdminExist) {
-      return new Response("Admin Account not found", { status: 404 });
-    }
+    const { username } = await params;
 
     const deletedAccount = await prismaClient.adminAccount.delete({
       where: {
-        id: userId,
+        username,
       },
     });
 
+    if (!deletedAccount) {
+      return new Response("Admin Account not found", { status: 404 });
+    }
     return Response.json({ status: 200, deletedAccount });
   } catch (error) {
     return new Response(`Database error: ${error}`, {
