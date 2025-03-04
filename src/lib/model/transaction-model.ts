@@ -1,5 +1,3 @@
-import { AdminAccount, Member } from "./user-model";
-
 export enum TransactionType {
   DEPOSIT = "DEPOSIT",
   WITHDRAWAL = "WITHDRAWAL",
@@ -12,6 +10,4 @@ export type Transaction = {
   type: TransactionType;
   description?: string;
   createdAt: Date;
-  admin: AdminAccount;
-  member: Member;
 };

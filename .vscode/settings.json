@@ -1,0 +1,16 @@
+{
+  "IDX.aI.enableInlineCompletion": true,
+  "IDX.aI.enableCodebaseIndexing": true,
+  "sqltools.connections": [
+    {
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 5432,
+      "driver": "PostgreSQL",
+      "name": "BM DM",
+      "database": "youtube",
+      "username": "user",
+      "password": "mypassword"
+    }
+  ]
+}

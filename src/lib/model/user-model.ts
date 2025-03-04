@@ -1,6 +1,11 @@
 import { Transaction } from "./transaction-model";
 
-export type AdminAccount = {
+export type CreateAdminRequest = {
+  name: string
+  email: string
+}
+
+export type AdminAccountResponse = {
   id: string;
   name: string;
   description?: string;
@@ -9,13 +14,12 @@ export type AdminAccount = {
   transaction: Transaction[];
 };
 
-export type MemberSignUp = {
-  name: string;
-  initialDeposit: number;
-  description?: string;
-};
+export type CreateMemberRequest = {
+  name: string
+  email: string
+}
 
-export type Member = {
+export type MemberResponse = {
   id: string;
   name: string;
   updatedAt: string;

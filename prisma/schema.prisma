@@ -10,42 +10,53 @@ datasource db {
 }
 
 model AdminAccount {
-  id          String        @id @default(uuid())
-  name        String
-  description String?
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  id           String        @id @default(uuid())
+  name         String
+  email        String        @unique
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
   transactions Transaction[]
 
   @@map("admin_accounts")
 }
 
 model Member {
-  id                String        @id @default(uuid())
-  name              String
-  updatedAt         DateTime      @updatedAt
-  balance           Int         @default(0)
-  transactions      Transaction[] @relation("MemberTransactions")
-  currentTransaction Transaction[] @relation("CurrentMemberTransactions")
+  id           String        @id @default(uuid())
+  name         String
+  email        String        @unique
+  updatedAt    DateTime      @updatedAt
+  balance      Int           @default(0)
+  transactions Transaction[] @relation("MemberTransactions")
+  transferring Transaction[] @relation("TransferringTransactions")
+  receiving    Transaction[] @relation("ReceivingTransactions")
 
   @@map("members")
 }
 
 model Transaction {
   id          String          @id @default(uuid())
-  amount      Int           
+  amount      Int
   type        TransactionType
   description String?
   createdAt   DateTime        @default(now())
-  
-  admin       AdminAccount    @relation(fields: [adminId], references: [id])
-  adminId     String
+  updatedAt   DateTime        @default(now())
 
-  member      Member          @relation("MemberTransactions", fields: [memberId], references: [id])
-  memberId    String
+  balanceBefore         Int
+  balanceAfter          Int
+  receiverBalanceBefore Int?
+  receiverBalanceAfter  Int?
 
-  currentMember Member?        @relation("CurrentMemberTransactions", fields: [currentMemberId], references: [id])
-  currentMemberId String?
+  admin   AdminAccount @relation(fields: [adminId], references: [id])
+  adminId String
+
+  member   Member @relation("MemberTransactions", fields: [memberId], references: [id])
+  memberId String
+
+  transferring   Member? @relation("TransferringTransactions", fields: [transferringId], references: [id])
+  transferringId String?
+
+  receiving   Member? @relation("ReceivingTransactions", fields: [receivingId], references: [id])
+  receivingId String?
 
   @@map("transactions")
 }
